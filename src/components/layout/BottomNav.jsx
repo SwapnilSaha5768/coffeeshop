@@ -33,16 +33,19 @@ export default function BottomNav() {
                         >
                             <item.icon size={24} fill={isActive ? "currentColor" : "none"} />
 
-                            {isCart && totalItems > 0 && (
+                            {isCart && (
                                 <AnimatePresence>
-                                    <motion.div
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        exit={{ scale: 0 }}
-                                        className="absolute -top-1 -right-1 bg-coffee-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white dark:border-coffee-950"
-                                    >
-                                        {totalItems > 9 ? '9+' : totalItems}
-                                    </motion.div>
+                                    {totalItems > 0 && (
+                                        <motion.div
+                                            key="cart-badge"
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            exit={{ scale: 0 }}
+                                            className="absolute -top-1 -right-1 bg-coffee-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white dark:border-coffee-950"
+                                        >
+                                            {totalItems > 9 ? '9+' : totalItems}
+                                        </motion.div>
+                                    )}
                                 </AnimatePresence>
                             )}
                         </button>

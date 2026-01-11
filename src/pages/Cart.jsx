@@ -110,12 +110,20 @@ export default function Cart() {
                         <p className="text-coffee-400/50 text-xs text-center mb-2 italic">Swipe left on item to remove</p>
                         <AnimatePresence>
                             {cartItems.map(item => (
-                                <CartItem
+                                <motion.div
                                     key={`${item.id}-${item.size}`}
-                                    item={item}
-                                    updateQuantity={updateQuantity}
-                                    removeFromCart={removeFromCart}
-                                />
+                                    layout
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <CartItem
+                                        item={item}
+                                        updateQuantity={updateQuantity}
+                                        removeFromCart={removeFromCart}
+                                    />
+                                </motion.div>
                             ))}
                         </AnimatePresence>
                     </div>

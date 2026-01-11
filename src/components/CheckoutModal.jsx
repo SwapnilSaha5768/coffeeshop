@@ -1,7 +1,8 @@
 
 import { createPortal } from 'react-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useForm } from 'react-hook-form';
 import { X, User, MapPin, ChevronDown, Check } from 'lucide-react';
 import Button from './ui/Button';
 
@@ -14,21 +15,38 @@ const NOOK_NAMES = [
 ];
 
 export default function CheckoutModal({ isOpen, onClose, onSubmit }) {
-    const [name, setName] = useState('');
-    const [location, setLocation] = useState(NOOK_NAMES[0]);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!name.trim()) {
-            setError('Please enter your name');
-            return;
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors },
+        reset
+    } = useForm({
+        defaultValues: {
+            name: '',
+            location: NOOK_NAMES[0]
         }
-        onSubmit({ name, location });
-        setName('');
-        setLocation(NOOK_NAMES[0]);
-        setError('');
+    });
+
+    const selectedLocation = watch('location');
+
+    // Reset form when modal opens/closes
+    useEffect(() => {
+        if (isOpen) {
+            reset({
+                name: '',
+                location: NOOK_NAMES[0]
+            });
+            setIsDropdownOpen(false);
+        }
+    }, [isOpen, reset]);
+
+    const onFormSubmit = (data) => {
+        onSubmit(data);
+        reset();
     };
 
     return createPortal(
@@ -37,6 +55,7 @@ export default function CheckoutModal({ isOpen, onClose, onSubmit }) {
                 <>
                     {/* Backdrop */}
                     <motion.div
+                        key="backdrop"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -46,6 +65,7 @@ export default function CheckoutModal({ isOpen, onClose, onSubmit }) {
 
                     {/* Modal */}
                     <motion.div
+                        key="modal"
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -59,7 +79,7 @@ export default function CheckoutModal({ isOpen, onClose, onSubmit }) {
                                 </button>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-5">
+                            <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5">
                                 <div>
                                     <label className="block text-base font-medium text-coffee-700 dark:text-coffee-300 mb-1 ml-1">Your Name</label>
                                     <div className="relative">
@@ -68,13 +88,15 @@ export default function CheckoutModal({ isOpen, onClose, onSubmit }) {
                                         </div>
                                         <input
                                             type="text"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
+                                            {...register("name", { required: "Please enter your name" })}
                                             placeholder="Enter your name"
-                                            className="w-full pl-12 pr-4 py-3.5 bg-coffee-50 dark:bg-coffee-950/50 border border-coffee-200 dark:border-coffee-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-coffee-500/50 text-coffee-900 dark:text-coffee-100 placeholder-coffee-400 dark:placeholder-coffee-600 transition-colors text-lg"
+                                            className={`w-full pl-12 pr-4 py-3.5 bg-coffee-50 dark:bg-coffee-950/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-coffee-500/50 text-coffee-900 dark:text-coffee-100 placeholder-coffee-400 dark:placeholder-coffee-600 transition-colors text-lg ${errors.name ? 'border-red-500' : 'border-coffee-200 dark:border-coffee-700/50'}`}
                                             autoFocus
                                         />
                                     </div>
+                                    {errors.name && (
+                                        <p className="text-red-500 text-sm mt-1 ml-1">{errors.name.message}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -89,7 +111,7 @@ export default function CheckoutModal({ isOpen, onClose, onSubmit }) {
                                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                             className="w-full pl-12 pr-10 py-3.5 bg-coffee-50 dark:bg-coffee-950/50 border border-coffee-200 dark:border-coffee-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-coffee-500/50 text-coffee-900 dark:text-coffee-100 transition-colors text-lg text-left truncate"
                                         >
-                                            {location}
+                                            {selectedLocation}
                                         </button>
 
                                         <div className={`absolute right-4 top-1/2 -translate-y-1/2 text-coffee-400 transition-transform duration-200 pointer-events-none z-10 ${isDropdownOpen ? 'rotate-180' : ''}`}>
@@ -110,13 +132,13 @@ export default function CheckoutModal({ isOpen, onClose, onSubmit }) {
                                                             key={nook}
                                                             type="button"
                                                             onClick={() => {
-                                                                setLocation(nook);
+                                                                setValue('location', nook);
                                                                 setIsDropdownOpen(false);
                                                             }}
-                                                            className={`w-full px-4 py-3 text-left hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-colors flex items-center justify-between group ${location === nook ? 'bg-coffee-100 dark:bg-coffee-700/50 text-coffee-900 dark:text-coffee-100 font-medium' : 'text-coffee-700 dark:text-coffee-300'}`}
+                                                            className={`w-full px-4 py-3 text-left hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-colors flex items-center justify-between group ${selectedLocation === nook ? 'bg-coffee-100 dark:bg-coffee-700/50 text-coffee-900 dark:text-coffee-100 font-medium' : 'text-coffee-700 dark:text-coffee-300'}`}
                                                         >
                                                             <span className="text-base">{nook}</span>
-                                                            {location === nook && <Check size={18} className="text-coffee-600 dark:text-coffee-400" />}
+                                                            {selectedLocation === nook && <Check size={18} className="text-coffee-600 dark:text-coffee-400" />}
                                                         </button>
                                                     ))}
                                                 </motion.div>
@@ -132,10 +154,6 @@ export default function CheckoutModal({ isOpen, onClose, onSubmit }) {
                                         )}
                                     </div>
                                 </div>
-
-                                {error && (
-                                    <p className="text-red-500 text-sm text-center">{error}</p>
-                                )}
 
                                 <Button type="submit" className="w-full mt-2 text-lg py-3">
                                     Confirm Order

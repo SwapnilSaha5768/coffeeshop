@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Home } from 'lucide-react';
 import Button from '../components/ui/Button';
@@ -7,7 +8,15 @@ export default function OrderSuccess() {
     const navigate = useNavigate();
     const location = useLocation();
     const { userDetails, orderId } = location.state || {};
-    // Fallback if accessed directly without state
+
+    useEffect(() => {
+        if (!userDetails) {
+            navigate('/home', { replace: true });
+        }
+    }, [userDetails, navigate]);
+
+    if (!userDetails) return null; // Prevent flicker
+
     const displayOrderId = orderId || '#ORD-1234';
 
     return (

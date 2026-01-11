@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
@@ -45,7 +45,25 @@ export function CartProvider({ children }) {
 
     const clearCart = () => setCartItems([]);
 
-    const [favorites, setFavorites] = useState([]);
+    // Initialize favorites from localStorage
+    const [favorites, setFavorites] = useState(() => {
+        try {
+            const saved = localStorage.getItem('favorites');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error("Failed to load favorites", e);
+            return [];
+        }
+    });
+
+    // Save favorites to localStorage whenever they change
+    useEffect(() => {
+        try {
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+        } catch (e) {
+            console.error("Failed to save favorites", e);
+        }
+    }, [favorites]);
 
     const toggleFavorite = (productId) => {
         setFavorites(prev => {
