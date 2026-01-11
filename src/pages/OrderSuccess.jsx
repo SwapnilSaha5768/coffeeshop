@@ -1,10 +1,14 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, Home } from 'lucide-react';
 import Button from '../components/ui/Button';
 
 export default function OrderSuccess() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { userDetails, orderId } = location.state || {};
+    // Fallback if accessed directly without state
+    const displayOrderId = orderId || '#ORD-1234';
 
     return (
         <div className="h-screen bg-coffee-50 dark:bg-coffee-950 flex flex-col items-center justify-center p-6 text-center space-y-8 font-sans overflow-hidden relative transition-colors duration-300">
@@ -27,9 +31,12 @@ export default function OrderSuccess() {
                 transition={{ delay: 0.3 }}
                 className="space-y-4 z-10"
             >
-                <h1 className="text-3xl font-serif font-bold text-coffee-900 dark:text-coffee-100 transition-colors">Order Placed!</h1>
+                <h1 className="text-3xl font-serif font-bold text-coffee-900 dark:text-coffee-100 transition-colors">
+                    {userDetails ? `Thank you, ${userDetails.name}!` : 'Order Placed!'}
+                </h1>
                 <p className="text-coffee-600 dark:text-coffee-300 max-w-xs mx-auto transition-colors">
-                    Your coffee is being brewed with love. Use order #1234 to track it.
+                    Your coffee is being brewed with love{userDetails ? ` for ${userDetails.location}` : ''}.<br />
+                    Use order <span className="font-mono font-bold">{displayOrderId}</span> to track it.
                 </p>
             </motion.div>
 

@@ -18,7 +18,7 @@ export default function BottomNav() {
     ];
 
     return (
-        <div className="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-coffee-950/90 backdrop-blur-lg border-t border-coffee-200 dark:border-coffee-800 p-4 pb-6 z-50 rounded-t-3xl transition-colors duration-300">
+        <div className="fixed bottom-0 left-0 w-full bg-[#FFF8E7]/90 dark:bg-coffee-950/90 backdrop-blur-lg border-t border-coffee-200 dark:border-coffee-800 p-4 pb-6 z-50 rounded-t-3xl transition-colors duration-300">
             <div className="flex justify-around items-center">
                 {navItems.map((item) => {
                     const isActive = location.pathname === item.path;

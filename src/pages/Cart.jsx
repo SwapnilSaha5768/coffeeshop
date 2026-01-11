@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Minus, Plus, Trash2, Coffee } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import Button from '../components/ui/Button';
+import CheckoutModal from '../components/CheckoutModal';
 
 import { useCart } from '../context/CartContext';
 
@@ -11,7 +13,6 @@ const CartItem = ({ item, updateQuantity, removeFromCart }) => {
 
     return (
         <div className="relative mb-4">
-            {/* Delete Background Layer */}
             <div className="absolute inset-0 bg-red-500/10 rounded-3xl flex items-center justify-end pr-6 overflow-hidden border border-red-500/20">
                 <motion.button
                     style={{ opacity: deleteOpacity }}
@@ -22,7 +23,6 @@ const CartItem = ({ item, updateQuantity, removeFromCart }) => {
                 </motion.button>
             </div>
 
-            {/* Draggable Item Content */}
             <motion.div
                 style={{ x }}
                 drag="x"
@@ -32,7 +32,6 @@ const CartItem = ({ item, updateQuantity, removeFromCart }) => {
                 className="relative bg-white dark:bg-coffee-800 p-4 rounded-3xl flex items-center justify-between space-x-4 border border-coffee-200 dark:border-coffee-700/50 shadow-md z-10 transition-colors"
             >
                 <div className="w-16 h-16 bg-coffee-100 dark:bg-coffee-900 rounded-2xl flex-shrink-0 flex items-center justify-center overflow-hidden transition-colors">
-                    {/* Img placeholder */}
                     <div className="w-full h-full bg-cover bg-center opacity-80" style={{ backgroundImage: `url(${item.image})`, backgroundColor: '#2e231e' }} />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -60,12 +59,26 @@ const CartItem = ({ item, updateQuantity, removeFromCart }) => {
 export default function Cart() {
     const navigate = useNavigate();
     const { cartItems, updateQuantity, removeFromCart, clearCart } = useCart();
+    const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
 
     const total = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2);
 
+    const handleCheckout = (userDetails) => {
+        // Generate a random Order ID (e.g., #ORD-1234)
+        const orderId = `#ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+
+        clearCart();
+        setIsCheckoutModalOpen(false);
+        navigate('/order-success', {
+            state: {
+                userDetails,
+                orderId
+            }
+        });
+    };
+
     return (
         <div className="h-[100dvh] overflow-hidden bg-coffee-50 dark:bg-coffee-950 flex flex-col p-6 space-y-6 font-sans transition-colors duration-300">
-            {/* Header */}
             <div className="flex items-center space-x-4">
                 <button onClick={() => navigate(-1)} className="text-coffee-900 dark:text-coffee-100 hover:bg-coffee-200 dark:hover:bg-coffee-800 p-2 rounded-xl transition-colors">
                     <ArrowLeft />
@@ -73,7 +86,6 @@ export default function Cart() {
                 <h1 className="text-xl font-bold text-coffee-900 dark:text-coffee-100 font-serif transition-colors">My Order</h1>
             </div>
 
-            {/* Order List */}
             {cartItems.length === 0 ? (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -94,7 +106,6 @@ export default function Cart() {
                 </motion.div>
             ) : (
                 <div className="flex-1 flex flex-col md:grid md:grid-cols-3 md:gap-8 min-h-0">
-                    {/* Items List */}
                     <div className="flex-1 space-y-2 overflow-y-auto pb-4 md:col-span-2 md:pr-2 scrollbar-hide">
                         <p className="text-coffee-400/50 text-xs text-center mb-2 italic">Swipe left on item to remove</p>
                         <AnimatePresence>
@@ -109,7 +120,6 @@ export default function Cart() {
                         </AnimatePresence>
                     </div>
 
-                    {/* Summary */}
                     <div className="md:col-span-1">
                         <div className="space-y-4 pt-4 border-t border-coffee-200/50 dark:border-coffee-800/50 md:border-t-0 md:bg-white dark:md:bg-coffee-800/30 md:p-6 md:rounded-3xl md:h-fit md:sticky md:top-4 transition-colors">
                             <h2 className="hidden md:block text-xl font-serif font-bold text-coffee-900 dark:text-coffee-100 mb-4 transition-colors">Order Summary</h2>
@@ -129,16 +139,19 @@ export default function Cart() {
                                 <span className="font-medium">Total Amount</span>
                                 <span className="text-coffee-900 dark:text-coffee-100 font-bold text-xl transition-colors"><span className="text-coffee-500 dark:text-coffee-500">$</span>{(total * 1.05).toFixed(2)}</span>
                             </div>
-                            <Button onClick={() => {
-                                clearCart();
-                                navigate('/order-success');
-                            }} className="w-full shadow-lg shadow-coffee-500/20">
+                            <Button onClick={() => setIsCheckoutModalOpen(true)} className="w-full shadow-lg shadow-coffee-500/20">
                                 Checkout Now
                             </Button>
                         </div>
                     </div>
                 </div>
             )}
+
+            <CheckoutModal
+                isOpen={isCheckoutModalOpen}
+                onClose={() => setIsCheckoutModalOpen(false)}
+                onSubmit={handleCheckout}
+            />
         </div>
     );
 }
