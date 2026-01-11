@@ -53,7 +53,7 @@ Start the development server:
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) to view it in your browser.
+Open [https://coffeeshop-opal.vercel.app/](https://coffeeshop-opal.vercel.app/) to view it in your browser.
 
 ### Building for Production
 
