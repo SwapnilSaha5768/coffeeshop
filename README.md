@@ -34,7 +34,7 @@ Follow these steps to set up the project locally.
 
 1.  Clone the repository:
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/SwapnilSaha5768/coffeeshop.git
     ```
 2.  Navigate to the project directory:
     ```bash
@@ -53,7 +53,7 @@ Start the development server:
 npm run dev
 ```
 
-Open [https://coffeeshop-opal.vercel.app/](https://coffeeshop-opal.vercel.app/) to view it in your browser.
+Open [http://localhost:5173/](http://localhost:5173/) to view it in your browser.
 
 ### Building for Production
 
@@ -75,3 +75,7 @@ npm run preview
 - `src/components`: Reusable UI components
 - `src/context`: React Context for global state (Cart, Theme)
 - `src/data`: Static data files
+
+## Live Demo
+
+[https://coffeeshop-opal.vercel.app](https://coffeeshop-opal.vercel.app/) to have a live demonstration
